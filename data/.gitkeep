@@ -1,0 +1,3 @@
+# Ce fichier permet de garder le dossier data dans Git
+# La base de données SQLite sera créée automatiquement ici
+
