@@ -326,3 +326,41 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
+// Navigation pour la page Vive-vice
+document.addEventListener('DOMContentLoaded', function() {
+    const navLinks = document.querySelectorAll('.nav-link');
+    const pages = document.querySelectorAll('.page');
+    
+    // Vérifier si on est sur la page Vive-vice
+    if (navLinks.length > 0) {
+        // Navigation entre les pages
+        navLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const targetPage = this.dataset.page;
+                
+                // Mettre à jour les liens actifs
+                navLinks.forEach(l => l.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Afficher la page correspondante
+                pages.forEach(page => {
+                    page.classList.remove('active');
+                });
+                
+                const targetPageElement = document.getElementById(`page-${targetPage}`);
+                if (targetPageElement) {
+                    targetPageElement.classList.add('active');
+                    
+                    // Scroll vers le haut
+                    window.scrollTo({
+                        top: 0,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    }
+});
+
