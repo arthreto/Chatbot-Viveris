@@ -59,6 +59,7 @@ $googleAuthUrl = 'https://accounts.google.com/o/oauth2/v2/auth?' . http_build_qu
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vive-vice - Service après vente TYPIQUE</title>
+    <link rel="icon" type="image/png" href="assets/mascotte.png">
     <link rel="stylesheet" href="assets/css/style.css?v=<?php echo time(); ?>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -86,6 +87,8 @@ $googleAuthUrl = 'https://accounts.google.com/o/oauth2/v2/auth?' . http_build_qu
             <div class="nav-links">
                 <a href="#" class="nav-link active" data-page="accueil">Accueil</a>
                 <a href="#" class="nav-link" data-page="galerie">Galerie</a>
+                <a href="#" class="nav-link" data-page="information">Information</a>
+                <a href="#" class="nav-link" data-page="cgu">CGU</a>
             </div>
             <div class="topbar-auth">
                 <?php if ($isLoggedIn && $user): ?>
@@ -117,11 +120,24 @@ $googleAuthUrl = 'https://accounts.google.com/o/oauth2/v2/auth?' . http_build_qu
             <p class="subtitle">Nous engageons les meilleurs supports et offrons un service exceptionnel depuis 1986</p>
         </div>
 
+        <!-- Section IA -->
+        <div class="ai-section">
+            <div class="ai-content">
+                <h2 class="ai-title">Parlez à notre IA super intelligente</h2>
+                <p class="ai-description">Découvrez notre assistant virtuel révolutionnaire, conçu pour répondre à toutes vos questions avec une précision exceptionnelle.</p>
+                <a href="chat.php" class="btn-ai">
+                    <span>💬</span>
+                    Commencer la conversation
+                </a>
+            </div>
+        </div>
+
+        <!-- Section Histoire -->
         <div class="content-section">
             <div class="container-text">
                 <h2>Notre Histoire</h2>
                 <p>
-                    Bienvenue chez <strong>Vive-vice</strong>, votre concurrent de longue date depuis 1986 ! 
+                    Bienvenue chez <strong>Vive-vice</strong>, un élément de longue date (depuis 1986) ! 
                     Nous sommes fiers d'être le concurrent le plus... <em>persistant</em> de Viveris.
                 </p>
                 <p>
@@ -140,23 +156,191 @@ $googleAuthUrl = 'https://accounts.google.com/o/oauth2/v2/auth?' . http_build_qu
                 </p>
             </div>
         </div>
+        </div>
+    </div>
 
-        <!-- Section IA -->
-        <div class="ai-section">
-            <div class="ai-content">
-                <h2 class="ai-title">Parlez à notre IA super intelligente</h2>
-                <p class="ai-description">Découvrez notre assistant virtuel révolutionnaire, conçu pour répondre à toutes vos questions avec une précision exceptionnelle.</p>
-                <?php if ($isLoggedIn && $user): ?>
-                    <a href="chat.php" class="btn-ai">
-                        <span>💬</span>
-                        Commencer la conversation
-                    </a>
-                <?php else: ?>
-                    <a href="<?php echo htmlspecialchars($googleAuthUrl); ?>" class="btn-ai">
-                        <span>🔐</span>
-                        Se connecter pour discuter
-                    </a>
-                <?php endif; ?>
+    <!-- Page Information -->
+    <div id="page-information" class="page">
+        <div class="page-wrapper">
+        <div class="content-section">
+            <div class="container-text">
+                <div style="background: rgba(16, 185, 129, 0.1); border-left: 4px solid #10b981; padding: 1rem; margin-bottom: 2rem; border-radius: 8px;">
+                    <p style="margin: 0; color: #10b981; font-weight: 600;">ℹ️ Cette page est la seule page sérieuse et non-troll du site.</p>
+                </div>
+                <h2>Informations Techniques</h2>
+                <p style="margin-bottom: 2rem;">
+                    Cette page présente le fonctionnement technique de notre plateforme de chatbot, 
+                    développée par l'équipe Boulixien.
+                </p>
+                
+                <h3>Architecture du Système</h3>
+                <p>
+                    Notre plateforme utilise une architecture web moderne basée sur PHP pour le backend 
+                    et JavaScript pour les interactions côté client. Le système de chatbot intègre l'API Groq 
+                    pour la génération de réponses intelligentes.
+                </p>
+                
+                <h3>Fonctionnement du Chatbot</h3>
+                <p>
+                    Le chatbot fonctionne selon un système de réponses multiples optimisé pour réduire 
+                    la consommation de ressources. Voici comment cela fonctionne :
+                </p>
+                <ol style="margin-left: 2rem; margin-top: 1rem; line-height: 2;">
+                    <li><strong>Réception du message utilisateur</strong> : L'utilisateur envoie un message via l'interface web.</li>
+                    <li><strong>Génération de la réponse principale</strong> : Le système effectue un unique appel API vers Groq pour générer la première réponse intelligente.</li>
+                    <li><strong>Création de variantes locales</strong> : À partir de cette réponse principale, le système génère localement 7 variantes en ajoutant des préfixes contextuels (par exemple : "Attends, j'ai trouvé mieux !", "En fait, ce que j'ai dit avant n'avait aucun sens...").</li>
+                    <li><strong>Affichage progressif</strong> : Les 8 réponses (1 principale + 7 variantes) sont affichées progressivement toutes les 20 secondes, avec un indicateur de frappe pendant 5 secondes avant chaque message.</li>
+                </ol>
+                
+                <h3>Optimisation Écologique</h3>
+                <p>
+                    Cette approche technique permet de réduire significativement la consommation énergétique 
+                    en limitant les appels API externes. Au lieu d'effectuer 8 appels API séparés (ce qui 
+                    multiplierait la consommation de ressources), notre système n'effectue qu'un seul appel 
+                    et génère les variantes localement.
+                </p>
+                <p>
+                    <strong>Bénéfices :</strong>
+                </p>
+                <ul style="margin-left: 2rem; margin-top: 1rem; line-height: 2;">
+                    <li>Réduction de 87.5% des appels API (1 appel au lieu de 8)</li>
+                    <li>Diminution de la latence réseau</li>
+                    <li>Optimisation des coûts d'infrastructure</li>
+                    <li>Réduction de l'empreinte carbone liée aux requêtes réseau</li>
+                </ul>
+                
+                <h3>Stockage des Données</h3>
+                <p>
+                    Les conversations sont stockées de deux manières selon le statut de l'utilisateur :
+                </p>
+                <ul style="margin-left: 2rem; margin-top: 1rem; line-height: 2;">
+                    <li><strong>Utilisateurs connectés</strong> : Les conversations sont sauvegardées dans une base de données SQLite, permettant une persistance à long terme et un accès multi-appareils.</li>
+                    <li><strong>Utilisateurs invités</strong> : Les conversations sont stockées localement dans le navigateur via localStorage, offrant une expérience sans authentification tout en préservant la confidentialité.</li>
+                </ul>
+                
+                <h3>Authentification</h3>
+                <p>
+                    Le système intègre l'authentification OAuth2 via Google, permettant aux utilisateurs 
+                    de se connecter de manière sécurisée et d'accéder à leurs conversations depuis n'importe 
+                    quel appareil.
+                </p>
+                
+                <h3>Technologies Utilisées</h3>
+                <ul style="margin-left: 2rem; margin-top: 1rem; line-height: 2;">
+                    <li><strong>Backend</strong> : PHP 8+, SQLite (PDO)</li>
+                    <li><strong>Frontend</strong> : HTML5, CSS3, JavaScript (ES6+)</li>
+                    <li><strong>API IA</strong> : Groq API</li>
+                    <li><strong>Authentification</strong> : Google OAuth2</li>
+                    <li><strong>Stockage local</strong> : localStorage (Web Storage API)</li>
+                </ul>
+                
+                <h3 style="margin-top: 3rem;">Crédits</h3>
+                <p style="margin-top: 1rem;">
+                    Images utilisées sur ce site :
+                </p>
+                <ul style="margin-left: 2rem; margin-top: 1rem; line-height: 2;">
+                    <li><a href="https://jack35.wordpress.com/2012/11/21/des-chercheurs-redemarrent-un-ordinateur-vieux-de-plus-de-60-ans/" target="_blank" rel="noopener noreferrer" style="color: var(--text-muted); text-decoration: underline;">Image 1</a> - Source : jack35.wordpress.com</li>
+                    <li><a href="https://www.weodeo.com/digitalisation/serveur-local-ou-datacenter-que-choisir" target="_blank" rel="noopener noreferrer" style="color: var(--text-muted); text-decoration: underline;">Image 2</a> - Source : weodeo.com</li>
+                </ul>
+            </div>
+        </div>
+        </div>
+    </div>
+
+    <!-- Page CGU -->
+    <div id="page-cgu" class="page">
+        <div class="page-wrapper">
+        <div class="content-section">
+            <div class="container-text">
+                <div style="background: rgba(239, 68, 68, 0.1); border-left: 4px solid #ef4444; padding: 1rem; margin-bottom: 2rem; border-radius: 8px;">
+                    <p style="margin: 0; color: #ef4444; font-weight: 600;">Cette page est une page TROLL et humoristique. Ne prenez rien au sérieux !</p>
+                </div>
+                <h2>Conditions Générales d'Utilisation</h2>
+                <p style="margin-bottom: 2rem; font-size: 0.9rem; color: var(--text-muted);">
+                    Dernière mise à jour : Jamais (on est trop occupés à vendre vos données)
+                </p>
+                
+                <h3>1. Vente de Vos Données Personnelles</h3>
+                <p>
+                    En utilisant notre service, vous acceptez que nous vendions toutes vos données personnelles 
+                    au plus offrant. Nous les revendons à des entreprises douteuses, des gouvernements étrangers, 
+                    et même à votre voisin si il paie assez cher. Vos messages, votre historique de navigation, 
+                    vos photos de chatons, tout y passe !
+                </p>
+                <p>
+                    <strong>Prix de vente approximatif :</strong> Vos données valent environ 0,03€ sur le marché noir. 
+                    On en fait une fortune, merci beaucoup !
+                </p>
+                
+                <h3>2. Propriété Intellectuelle</h3>
+                <p>
+                    Tout ce que vous écrivez sur notre plateforme nous appartient désormais. Vos idées brillantes, 
+                    vos poèmes, vos recettes secrètes... Tout est à nous maintenant ! On peut même les revendre 
+                    comme si c'était les nôtres. C'est dans les CGU, vous avez signé !
+                </p>
+                
+                <h3>3. Responsabilité</h3>
+                <p>
+                    Nous ne sommes responsables de RIEN. Si notre chatbot vous donne de mauvais conseils et que 
+                    vous perdez votre emploi, c'est votre problème. Si il vous dit de manger 50 bananes par jour 
+                    et que vous tombez malade, c'est encore votre problème. On s'en lave les mains !
+                </p>
+                
+                <h3>4. Modification du Service</h3>
+                <p>
+                    On peut changer n'importe quoi, n'importe quand, sans vous prévenir. On peut transformer 
+                    le chatbot en distributeur de bonbons, on peut vendre le site à des aliens, on peut 
+                    tout simplement le fermer demain. Vous n'avez aucun recours. C'est la vie !
+                </p>
+                
+                <h3>5. Résiliation</h3>
+                <p>
+                    Vous ne pouvez pas résilier votre compte. Une fois que vous êtes entré, vous êtes piégé 
+                    pour l'éternité. Même après votre mort, on continuera à vendre vos données. C'est comme 
+                    un abonnement Netflix, mais en pire !
+                </p>
+                
+                <h3>6. Cookies et Traçage</h3>
+                <p>
+                    On utilise TOUS les cookies possibles. On vous suit partout, même dans votre salle de bain. 
+                    On sait quand vous vous brossez les dents, combien de temps vous passez sur les réseaux sociaux, 
+                    et on vend toutes ces infos. Big Brother, c'est nous !
+                </p>
+                
+                <h3>7. Données Bancaires</h3>
+                <p>
+                    Même si on ne vous demande pas vos données bancaires, on les a quand même. On les a piratées. 
+                    C'est un secret, mais maintenant vous le savez. Ne le dites à personne !
+                </p>
+                
+                <h3>8. Clause de Non-Responsabilité Absolue</h3>
+                <p>
+                    Si quelque chose de mal arrive à cause de notre service (et ça arrivera), c'est 100% votre faute. 
+                    On n'a rien à voir là-dedans. On est innocents comme des agneaux. Bêêê !
+                </p>
+                
+                <h3>9. Droit Applicable</h3>
+                <p>
+                    Ces CGU sont régies par les lois de la République de Banania, un pays qui n'existe pas. 
+                    En cas de litige, vous devrez vous battre en duel avec notre PDG. Armes autorisées : 
+                    épées, haches, ou conversations philosophiques.
+                </p>
+                
+                <h3>10. Acceptation</h3>
+                <p>
+                    En utilisant ce site, vous acceptez TOUT ce qui est écrit ci-dessus, même si vous ne l'avez pas lu. 
+                    C'est comme ça que ça marche. On vous a eu !
+                </p>
+                
+                <div style="background: rgba(239, 68, 68, 0.1); border: 2px dashed #ef4444; padding: 2rem; margin-top: 3rem; border-radius: 8px; text-align: center;">
+                    <p style="margin: 0; font-size: 1.2rem; font-weight: 700; color: #ef4444;">
+                        RAPPEL : Cette page est TROLL ! Ne prenez rien au sérieux !
+                    </p>
+                    <p style="margin-top: 1rem; color: var(--text-muted);">
+                        En réalité, nous respectons votre vie privée et vos données sont protégées. 
+                        Mais c'était marrant, non ?
+                    </p>
+                </div>
             </div>
         </div>
         </div>
