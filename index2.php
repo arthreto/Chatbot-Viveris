@@ -315,7 +315,6 @@
     </div>
 
     <script>
-        // Ajout de particules animées en arrière-plan
         function createParticles() {
             const particleCount = 20;
             for (let i = 0; i < particleCount; i++) {

@@ -2,7 +2,6 @@
 require_once 'config/config.php';
 require_once 'config/database.php';
 
-// Fonction pour charger les images d'un dossier
 function loadImagesFromFolder($folder) {
     $images = [];
     $path = __DIR__ . '/data/pictures/' . $folder;
@@ -25,7 +24,6 @@ function loadImagesFromFolder($folder) {
 $nosLocauxImages = loadImagesFromFolder('noslocaux');
 $viverisImages = loadImagesFromFolder('viveris');
 
-// Vérifier si l'utilisateur est connecté
 $isLoggedIn = isset($_SESSION['user_id']);
 $user = null;
 
@@ -39,12 +37,10 @@ if ($isLoggedIn) {
             $user = $userObj->getById($_SESSION['user_id']);
         }
     } catch (Exception $e) {
-        // Erreur silencieuse, l'utilisateur sera considéré comme non connecté
         $isLoggedIn = false;
     }
 }
 
-// URL de connexion Google
 $googleAuthUrl = 'https://accounts.google.com/o/oauth2/v2/auth?' . http_build_query([
     'client_id' => GOOGLE_CLIENT_ID,
     'redirect_uri' => GOOGLE_REDIRECT_URI,
@@ -59,7 +55,7 @@ $googleAuthUrl = 'https://accounts.google.com/o/oauth2/v2/auth?' . http_build_qu
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vive-vice - Service après vente TYPIQUE</title>
-    <link rel="icon" type="image/png" href="assets/mascotte.png">
+    <link rel="icon" type="image/png" href="assets/logo.png">
     <link rel="stylesheet" href="assets/css/style.css?v=<?php echo time(); ?>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -73,8 +69,8 @@ $googleAuthUrl = 'https://accounts.google.com/o/oauth2/v2/auth?' . http_build_qu
         }
         body {
             font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            color: #f1f5f9;
+            background: linear-gradient(135deg, rgb(36, 59, 49) 0%, rgb(75, 137, 98) 100%);
+            color: rgb(192, 208, 190);
             min-height: 100vh;
         }
     </style>
@@ -83,11 +79,11 @@ $googleAuthUrl = 'https://accounts.google.com/o/oauth2/v2/auth?' . http_build_qu
     <!-- Topbar -->
     <nav class="topbar">
         <div class="topbar-container">
-            <div class="logo">Vive-vice</div>
+            <a href="https://boulixien.velocitystudios.fr" class="logo" title="Retour à l'accueil principal" style="text-decoration: none;">
+                <img src="assets/logo.png" alt="Logo" class="logo-img">
+                Vive-vice
+            </a>
             <div class="nav-links">
-                <a href="https://boulixien.velocitystudios.fr" class="nav-link" title="Retour à l'accueil principal" style="text-decoration: none;">
-                    <span>🏠</span> Home
-                </a>
                 <a href="#" class="nav-link active" data-page="accueil">Accueil</a>
                 <a href="#" class="nav-link" data-page="galerie">Galerie</a>
                 <a href="#" class="nav-link" data-page="information">Information</a>

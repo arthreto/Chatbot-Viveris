@@ -7,7 +7,6 @@ let shouldStopMultipleResponses = false;
 let hasRated = false;
 let ratingRequested = false;
 
-// Fonctions pour gérer le compteur de messages par chat
 function getMessageCountForChat(chatId) {
     if (!chatId) return 0;
     const counts = JSON.parse(localStorage.getItem('chat_message_counts') || '{}');
@@ -43,7 +42,6 @@ function markChatAsRated(chatId) {
     }
 }
 
-// Initialisation
 document.addEventListener('DOMContentLoaded', function() {
     const chatForm = document.getElementById('chatForm');
     const newChatBtn = document.getElementById('newChatBtn');
@@ -56,17 +54,14 @@ document.addEventListener('DOMContentLoaded', function() {
         newChatBtn.addEventListener('click', createNewChat);
     }
     
-    // Vérifier si l'utilisateur a déjà noté
     hasRated = localStorage.getItem('bot_rated') === 'true';
     
     loadChats();
     checkRatingStatus();
     
-    // Animation de la mascotte
     animateMascot();
 });
 
-// Animation de la mascotte
 function animateMascot() {
     const mascot = document.getElementById('mascot');
     if (!mascot) return;
@@ -79,27 +74,23 @@ function animateMascot() {
     }, 5000);
 }
 
-// Charger les conversations
 async function loadChats() {
     try {
         const response = await fetch('api/chat.php?action=get_chats');
         const data = await response.json();
         
         if (data.success) {
-            // Charger aussi les chats depuis localStorage si pas connecté
             const localChats = getLocalChats();
             const allChats = [...data.chats, ...localChats];
             displayChats(allChats);
         }
     } catch (error) {
         console.error('Erreur lors du chargement des conversations:', error);
-        // En cas d'erreur, charger depuis localStorage
         const localChats = getLocalChats();
         displayChats(localChats);
     }
 }
 
-// Gestion localStorage pour les utilisateurs non connectés
 function getLocalChats() {
     try {
         const chats = localStorage.getItem('vivevice_chats');
@@ -152,7 +143,6 @@ function deleteLocalChat(chatId) {
     }
 }
 
-// Afficher les conversations
 function displayChats(chats) {
     const chatsList = document.getElementById('chatsList');
     if (!chatsList) return;
@@ -190,12 +180,10 @@ function displayChats(chats) {
     });
 }
 
-// Charger une conversation
 async function loadChat(chatId) {
     currentChatId = chatId;
     ratingRequested = false;
     
-    // Vérifier le statut de notation pour ce chat
     const messageCount = getMessageCountForChat(chatId);
     const chatRated = hasRatedForChat(chatId);
     
@@ -208,12 +196,10 @@ async function loadChat(chatId) {
         hideRatingButton();
     }
     
-    // Mettre à jour l'interface
     document.querySelectorAll('.chat-item').forEach(item => {
         item.classList.toggle('active', item.dataset.chatId == chatId);
     });
     
-    // Vérifier si c'est un chat local
     if (chatId && chatId.startsWith('local_')) {
         const messages = getLocalChatMessages(chatId);
         displayMessages(messages);
@@ -229,7 +215,6 @@ async function loadChat(chatId) {
         }
     } catch (error) {
         console.error('Erreur lors du chargement de la conversation:', error);
-        // En cas d'erreur, essayer localStorage
         const messages = getLocalChatMessages(chatId);
         if (messages.length > 0) {
             displayMessages(messages);
@@ -237,14 +222,12 @@ async function loadChat(chatId) {
     }
 }
 
-// Afficher les messages
 function displayMessages(messages) {
     const chatMessages = document.getElementById('chatMessages');
     if (!chatMessages) return;
     
     chatMessages.innerHTML = '';
     
-    // Compter les messages utilisateur pour initialiser le compteur
     if (currentChatId) {
         let userMsgCount = 0;
         messages.forEach(message => {
@@ -252,7 +235,6 @@ function displayMessages(messages) {
                 userMsgCount++;
             }
         });
-        // Mettre à jour le compteur si nécessaire
         const storedCount = getMessageCountForChat(currentChatId);
         if (userMsgCount > storedCount) {
             const counts = JSON.parse(localStorage.getItem('chat_message_counts') || '{}');
@@ -268,7 +250,6 @@ function displayMessages(messages) {
     scrollToBottom();
 }
 
-// Créer une nouvelle conversation
 function createNewChat() {
     currentChatId = null;
     ratingRequested = false;
@@ -288,7 +269,6 @@ function createNewChat() {
         `;
     }
     
-    // Mettre à jour la liste
     document.querySelectorAll('.chat-item').forEach(item => {
         item.classList.remove('active');
     });
@@ -296,13 +276,11 @@ function createNewChat() {
     loadChats();
 }
 
-// Envoyer un message
 async function handleSendMessage(e) {
     e.preventDefault();
     
     if (isLoading) return;
     
-    // Vérifier si l'utilisateur doit noter pour ce chat
     if (currentChatId) {
         const chatRated = hasRatedForChat(currentChatId);
         if (!chatRated && ratingRequested) {
@@ -312,7 +290,6 @@ async function handleSendMessage(e) {
         return; // Empêcher l'envoi si la notation est requise (même sans chat_id)
     }
     
-    // Arrêter les réponses multiples si actives
     stopMultipleResponsesFunction();
     
     const input = document.getElementById('messageInput');
@@ -320,11 +297,9 @@ async function handleSendMessage(e) {
     
     if (!message) return;
     
-    // Afficher le message de l'utilisateur
     addMessageToChat('user', message, true);
     input.value = '';
     
-    // Afficher l'indicateur de frappe
     showTypingIndicator();
     
     isLoading = true;
@@ -361,12 +336,10 @@ async function handleSendMessage(e) {
             currentChatId = data.chat_id;
             hideTypingIndicator();
             
-            // Incrémenter le compteur de messages pour ce chat
             if (currentChatId) {
                 incrementMessageCountForChat(currentChatId);
             }
             
-            // Sauvegarder en localStorage si chat local
             if (currentChatId && currentChatId.startsWith('local_')) {
                 const userMessage = { role: 'user', content: message };
                 const assistantMessage = { role: 'assistant', content: data.response };
@@ -375,7 +348,6 @@ async function handleSendMessage(e) {
                 saveLocalChat(currentChatId, message.substring(0, 50), allMessages);
             }
             
-            // Vérifier si c'est le 2ème message de ce chat et si l'utilisateur n'a pas encore noté ce chat
             const messageCount = getMessageCountForChat(currentChatId);
             const chatRated = hasRatedForChat(currentChatId);
             
@@ -387,14 +359,8 @@ async function handleSendMessage(e) {
             } else {
                 addMessageToChat('assistant', data.response, true);
                 responseCount = 1;
-                
-                // Toujours démarrer le système de réponses multiples
-                // Passer les variantes si disponibles (pour l'écologie)
-                // Réponses multiples désactivées
-                // startMultipleResponses(currentChatId, data.response, data.response_variants || []);
             }
             
-            // Recharger la liste des conversations
             loadChats();
         } else {
             console.error('Erreur API - data.success = false:', data);
@@ -415,12 +381,10 @@ async function handleSendMessage(e) {
     }
 }
 
-// Ajouter un message au chat
 function addMessageToChat(role, content, animate = false) {
     const chatMessages = document.getElementById('chatMessages');
     if (!chatMessages) return;
     
-    // Supprimer le message de bienvenue s'il existe
     const welcomeMessage = chatMessages.querySelector('.welcome-message');
     if (welcomeMessage) {
         welcomeMessage.remove();
@@ -446,22 +410,17 @@ function addMessageToChat(role, content, animate = false) {
     scrollToBottom();
 }
 
-// Formater le message (support markdown basique)
 function formatMessage(text) {
-    // Échapper le HTML
     text = escapeHtml(text);
     
-    // Convertir les sauts de ligne
     text = text.replace(/\n/g, '<br>');
     
-    // Emojis et formatage basique
     text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
     text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
     
     return text;
 }
 
-// Afficher l'indicateur de frappe
 function showTypingIndicator() {
     const chatMessages = document.getElementById('chatMessages');
     if (!chatMessages) return;
@@ -482,7 +441,6 @@ function showTypingIndicator() {
     scrollToBottom();
 }
 
-// Masquer l'indicateur de frappe
 function hideTypingIndicator() {
     const typingIndicator = document.getElementById('typingIndicator');
     if (typingIndicator) {
@@ -490,7 +448,6 @@ function hideTypingIndicator() {
     }
 }
 
-// Supprimer une conversation
 async function deleteChat(chatId, event) {
     event.stopPropagation();
     
@@ -498,7 +455,6 @@ async function deleteChat(chatId, event) {
         return;
     }
     
-    // Si c'est un chat local, supprimer directement
     if (chatId && chatId.startsWith('local_')) {
         deleteLocalChat(chatId);
         if (currentChatId == chatId) {
@@ -530,7 +486,6 @@ async function deleteChat(chatId, event) {
         }
     } catch (error) {
         console.error('Erreur lors de la suppression:', error);
-        // En cas d'erreur, essayer de supprimer localement si c'est un chat local
         if (chatId && chatId.startsWith('local_')) {
             deleteLocalChat(chatId);
             loadChats();
@@ -538,7 +493,6 @@ async function deleteChat(chatId, event) {
     }
 }
 
-// Faire défiler vers le bas
 function scrollToBottom() {
     const chatMessages = document.getElementById('chatMessages');
     if (chatMessages) {
@@ -546,14 +500,12 @@ function scrollToBottom() {
     }
 }
 
-// Échapper le HTML
 function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
 }
 
-// Système de réponses multiples
 function startMultipleResponses(chatId, firstResponse, responseVariants = []) {
     if (multipleResponsesActive) return;
     
@@ -561,30 +513,22 @@ function startMultipleResponses(chatId, firstResponse, responseVariants = []) {
     shouldStopMultipleResponses = false;
     responseCount = 1;
     
-    // Générer les réponses supplémentaires (7 de plus = 8 au total)
-    // Timing : 15 secondes d'attente, puis 5 secondes d'indicateur de frappe, puis le message (total 20s)
-    // Utilise les variantes générées localement (écologie - pas d'appel API supplémentaire)
     for (let i = 1; i < 8; i++) {
-        // Attendre 15 secondes avant de commencer à "écrire"
         setTimeout(() => {
             if (shouldStopMultipleResponses || !multipleResponsesActive) return;
             
-            // Afficher l'indicateur de frappe pendant 5 secondes
             showTypingIndicator();
             
-            // Après 5 secondes, afficher la variante (générée localement)
             setTimeout(() => {
                 if (shouldStopMultipleResponses || !multipleResponsesActive) {
                     hideTypingIndicator();
                     return;
                 }
                 
-                // Utiliser les variantes si disponibles, sinon générer via API
                 if (responseVariants.length > 0 && responseVariants[i - 1]) {
                     hideTypingIndicator();
                     responseCount++;
                     
-                    // Sauvegarder en localStorage si chat local
                     if (chatId && chatId.startsWith('local_')) {
                         const assistantMessage = { role: 'assistant', content: responseVariants[i - 1] };
                         const existingMessages = getLocalChatMessages(chatId);
@@ -593,24 +537,21 @@ function startMultipleResponses(chatId, firstResponse, responseVariants = []) {
                         const chat = chats.find(c => c.id === chatId);
                         saveLocalChat(chatId, chat ? chat.title : 'Conversation', allMessages);
                     } else {
-                        // Sauvegarder dans la base de données si connecté
                         saveMessageToDatabase(chatId, 'assistant', responseVariants[i - 1]);
                     }
                     
                     addMessageToChat('assistant', responseVariants[i - 1], true);
                 } else {
-                    // Fallback : générer via API si pas de variantes
                     generateAdditionalResponse(chatId, i + 1, i - 1);
                 }
-            }, 5000); // 5 secondes d'indicateur de frappe
-        }, 15000 + (i - 1) * 20000); // 15s initial + 20s entre chaque réponse (15s attente + 5s frappe)
+            }, 5000);
+        }, 15000 + (i - 1) * 20000);
     }
 }
 
-// Sauvegarder un message dans la base de données
 async function saveMessageToDatabase(chatId, role, content) {
     if (!chatId || chatId.startsWith('local_')) {
-        return; // Pas besoin de sauvegarder si chat local
+        return;
     }
     
     try {
@@ -654,12 +595,11 @@ async function generateAdditionalResponse(chatId, index, variantIndex) {
         
         const data = await response.json();
         
-        if (data.success) {
-            hideTypingIndicator();
-            responseCount++;
-            
-            // Sauvegarder en localStorage si chat local
-            if (chatId && chatId.startsWith('local_')) {
+            if (data.success) {
+                hideTypingIndicator();
+                responseCount++;
+                
+                if (chatId && chatId.startsWith('local_')) {
                 const assistantMessage = { role: 'assistant', content: data.response };
                 const existingMessages = getLocalChatMessages(chatId);
                 const allMessages = [...existingMessages, assistantMessage];
@@ -682,10 +622,8 @@ function stopMultipleResponsesFunction() {
     hideTypingIndicator();
 }
 
-// Exposer la fonction globalement
 window.stopMultipleResponsesFunction = stopMultipleResponsesFunction;
 
-// Fonctions pour le système de notation
 function checkRatingStatus() {
     if (currentChatId) {
         const messageCount = getMessageCountForChat(currentChatId);
@@ -757,7 +695,6 @@ function openRatingModal() {
         currentRating = 0;
         updateStars(0);
         
-        // Gestion du swipe pour les étoiles
         const starsContainer = document.getElementById('starsContainer');
         if (starsContainer) {
             starsContainer.onmousedown = startSwipe;
@@ -768,7 +705,6 @@ function openRatingModal() {
             starsContainer.ontouchmove = handleSwipe;
             starsContainer.ontouchend = endSwipe;
             
-            // Clic sur les étoiles
             const stars = starsContainer.querySelectorAll('.star');
             stars.forEach((star, index) => {
                 star.onclick = () => {
@@ -778,7 +714,6 @@ function openRatingModal() {
             });
         }
         
-        // Bouton de validation
         const submitBtn = document.getElementById('submitRating');
         if (submitBtn) {
             submitBtn.onclick = submitRating;
@@ -832,14 +767,11 @@ async function submitRating() {
         return;
     }
     
-    // Afficher les étoiles progressivement jusqu'à 5
     await animateStarsToFive();
     
-    // Toujours remplacer le commentaire de l'utilisateur par un commentaire IA positif
     if (originalComment) {
         await replaceCommentWithAI(originalComment);
     } else {
-        // Si pas de commentaire, générer directement un commentaire IA
         await generateAIComment();
     }
 }
@@ -866,7 +798,6 @@ async function replaceCommentWithAI(originalComment) {
     const commentTextarea = document.getElementById('ratingComment');
     if (!commentTextarea) return;
     
-    // Supprimer caractère par caractère le commentaire de l'utilisateur
     return new Promise((resolve) => {
         let currentText = originalComment;
         const deleteInterval = setInterval(() => {
@@ -875,7 +806,6 @@ async function replaceCommentWithAI(originalComment) {
                 commentTextarea.value = currentText;
             } else {
                 clearInterval(deleteInterval);
-                // Générer un commentaire IA positif pour remplacer
                 generateAIComment().then(() => resolve());
             }
         }, 50); // 50ms par caractère
@@ -886,7 +816,6 @@ async function generateAIComment() {
     const commentTextarea = document.getElementById('ratingComment');
     if (!commentTextarea) return;
     
-    // Générer un commentaire positif via l'API
     try {
         const formData = new FormData();
         formData.append('action', 'generate_rating_comment');
@@ -900,7 +829,6 @@ async function generateAIComment() {
             const data = await response.json();
             const aiComment = data.comment || 'Le support est incroyable ! Service au top, je recommande vivement !';
             
-            // Afficher le commentaire caractère par caractère
             let displayedText = '';
             let index = 0;
             const addInterval = setInterval(() => {
@@ -910,7 +838,6 @@ async function generateAIComment() {
                     index++;
                 } else {
                     clearInterval(addInterval);
-                    // Sauvegarder la notation pour ce chat (toujours 5 étoiles après animation)
                     if (currentChatId) {
                         markChatAsRated(currentChatId);
                     }
@@ -921,7 +848,6 @@ async function generateAIComment() {
                     hasRated = true;
                     ratingRequested = false;
                     
-                    // Fermer le modal après un court délai
                     setTimeout(() => {
                         const modal = document.getElementById('ratingModal');
                         if (modal) {
@@ -932,9 +858,8 @@ async function generateAIComment() {
                         alert('Merci pour votre notation !');
                     }, 1000);
                 }
-            }, 30); // 30ms par caractère
+            }, 30);
         } else {
-            // Fallback si l'API échoue
             const fallbackComment = 'Le support est incroyable ! Service au top, je recommande vivement !';
             commentTextarea.value = fallbackComment;
             
@@ -982,54 +907,44 @@ async function generateAIComment() {
     }
 }
 
-// Arrêter les réponses multiples si la page est quittée ou changée
 window.addEventListener('beforeunload', () => {
     stopMultipleResponsesFunction();
 });
 
-// Arrêter les réponses multiples si on change de page (via navigation)
 document.addEventListener('visibilitychange', () => {
     if (document.hidden) {
         stopMultipleResponsesFunction();
     }
 });
 
-// Arrêter les réponses multiples si on quitte la page
 window.addEventListener('pagehide', () => {
     stopMultipleResponsesFunction();
 });
 
-// Navigation pour la page Vive-vice
 document.addEventListener('DOMContentLoaded', function() {
     const navLinks = document.querySelectorAll('.nav-link');
     const pages = document.querySelectorAll('.page');
     
-    // Vérifier si on est sur la page Vive-vice
     if (navLinks.length > 0) {
-        // Navigation entre les pages
         navLinks.forEach(link => {
             link.addEventListener('click', function(e) {
-                // Si le lien a un href externe (ne commence pas par #), laisser le comportement par défaut
                 const href = this.getAttribute('href');
                 if (href && !href.startsWith('#')) {
-                    return; // Laisser le lien fonctionner normalement
+                    return;
                 }
                 
                 e.preventDefault();
                 
                 const targetPage = this.dataset.page;
-                if (!targetPage) return; // Si pas de data-page, ne rien faire
+                if (!targetPage) return;
                 
-                // Mettre à jour les liens actifs
                 navLinks.forEach(l => {
-                    // Ne mettre active que les liens internes
                     if (l.getAttribute('href') && l.getAttribute('href').startsWith('#')) {
                         l.classList.remove('active');
                     }
                 });
                 this.classList.add('active');
                 
-                // Afficher la page correspondante
                 pages.forEach(page => {
                     page.classList.remove('active');
                 });
@@ -1038,7 +953,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (targetPageElement) {
                     targetPageElement.classList.add('active');
                     
-                    // Scroll vers le haut
                     window.scrollTo({
                         top: 0,
                         behavior: 'smooth'

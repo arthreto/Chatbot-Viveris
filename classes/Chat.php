@@ -58,13 +58,11 @@ class Chat {
     }
 
     public function delete($chatId, $userId) {
-        // Supprimer d'abord les messages
         $query = "DELETE FROM messages WHERE chat_id = :chat_id";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':chat_id', $chatId);
         $stmt->execute();
 
-        // Puis supprimer le chat
         $query = "DELETE FROM " . $this->table . " 
                   WHERE id = :id AND user_id = :user_id";
         $stmt = $this->conn->prepare($query);

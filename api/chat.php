@@ -7,12 +7,9 @@ require_once '../classes/OpenAI.php';
 
 header('Content-Type: application/json');
 
-// Fonction pour générer des variantes de réponse localement (écologie)
 function generateResponseVariants($originalResponse) {
-    // Extraire le contenu principal sans les préfixes répétitifs
     $cleanResponse = $originalResponse;
     
-    // Liste des préfixes à éviter pour éviter les répétitions
     $prefixes = [
         "Attends, j'ai trouvé mieux ! ",
         "En fait, ce que j'ai dit avant n'avait aucun sens. Voici ma vraie réponse : ",
@@ -23,7 +20,6 @@ function generateResponseVariants($originalResponse) {
         "Finalement, après réflexion, je dirais plutôt : "
     ];
     
-    // Nettoyer la réponse originale des préfixes existants
     foreach ($prefixes as $prefix) {
         if (strpos($cleanResponse, $prefix) === 0) {
             $cleanResponse = substr($cleanResponse, strlen($prefix));
@@ -31,7 +27,6 @@ function generateResponseVariants($originalResponse) {
         }
     }
     
-    // Générer des variantes plus variées et moins répétitives
     $variants = [];
     $variants[] = "Attends, j'ai trouvé mieux ! " . $cleanResponse;
     $variants[] = "En fait, ce que j'ai dit avant n'avait aucun sens. Voici ma vraie réponse : " . $cleanResponse;
@@ -41,17 +36,14 @@ function generateResponseVariants($originalResponse) {
     $variants[] = "En y repensant, je me suis trompé. La bonne réponse c'est : " . $cleanResponse;
     $variants[] = "Finalement, après réflexion, je dirais plutôt : " . $cleanResponse;
     
-    // Mélanger les variantes pour éviter les répétitions
     shuffle($variants);
     
     return $variants;
 }
 
-// Permettre l'utilisation sans connexion (sauvegarde en localStorage côté client)
 $isLoggedIn = isset($_SESSION['user_id']);
 $userId = $isLoggedIn ? $_SESSION['user_id'] : null;
 
-// Si pas connecté, utiliser un ID temporaire basé sur la session
 if (!$isLoggedIn) {
     if (!isset($_SESSION['guest_id'])) {
         $_SESSION['guest_id'] = 'guest_' . uniqid() . '_' . time();
@@ -79,7 +71,6 @@ switch ($action) {
             exit;
         }
 
-        // Créer un nouveau chat si nécessaire
         if (!$chatId) {
             error_log("Chat API: Création d'un nouveau chat pour user_id: " . $userId);
             if ($isLoggedIn && $db) {
@@ -92,19 +83,16 @@ switch ($action) {
                 }
                 error_log("Chat API: Nouveau chat créé avec ID: " . $chatId);
             } else {
-                // Mode invité : générer un ID temporaire
                 $chatId = 'local_' . uniqid() . '_' . time();
                 error_log("Chat API: Chat local créé avec ID: " . $chatId);
             }
         }
 
-        // Sauvegarder le message de l'utilisateur
         if ($isLoggedIn && $db) {
             $messageObj = new Message($db);
             $messageObj->create($chatId, 'user', $message);
         }
 
-        // Récupérer l'historique
         $history = [];
         if ($isLoggedIn && $db) {
             $messageObj = new Message($db);
@@ -117,7 +105,6 @@ switch ($action) {
             ];
         }, $history);
 
-        // Générer la première réponse de l'IA via Groq
         error_log("Chat API: Génération de la réponse pour chat_id: " . $chatId);
         error_log("Chat API: GROQ_API_KEY présent: " . (!empty(OPENAI_API_KEY) ? "Oui (longueur: " . strlen(OPENAI_API_KEY) . ")" : "NON"));
         error_log("Chat API: GROQ_MODEL: " . OPENAI_MODEL);
@@ -128,12 +115,10 @@ switch ($action) {
         
         error_log("Chat API: Première réponse générée (longueur: " . strlen($firstResponse) . ")");
 
-        // Sauvegarder la première réponse
         if ($isLoggedIn && $db) {
             $messageObj = new Message($db);
             $messageObj->create($chatId, 'assistant', $firstResponse);
 
-            // Mettre à jour le titre du chat si c'est le premier message
             $chatObj = new Chat($db);
             $chat = $chatObj->getById($chatId, $userId);
             if ($chat && strpos($chat['title'], 'Nouvelle conversation') === 0) {
@@ -162,8 +147,6 @@ switch ($action) {
             exit;
         }
 
-        // Utiliser les variantes générées localement (pas d'appel API - écologie)
-        // Les variantes sont passées depuis le frontend
         $variants = [
             "Attends, j'ai trouvé mieux ! ",
             "En fait, ce que j'ai dit avant n'avait aucun sens. Voici ma vraie réponse : ",
@@ -174,16 +157,13 @@ switch ($action) {
             "Finalement, après réflexion, je dirais plutôt : "
         ];
         
-        // Récupérer la réponse originale depuis l'historique
         $originalResponse = "";
         if ($isLoggedIn && $db) {
             $messageObj = new Message($db);
             $history = $messageObj->getHistoryForAI($chatId, 10);
-            // Trouver la dernière réponse de l'assistant
             foreach (array_reverse($history) as $msg) {
                 if ($msg['role'] === 'assistant') {
                     $originalResponse = $msg['content'];
-                    // Enlever les préfixes si déjà présents
                     foreach ($variants as $variant) {
                         if (strpos($originalResponse, $variant) === 0) {
                             $originalResponse = substr($originalResponse, strlen($variant));
@@ -195,16 +175,13 @@ switch ($action) {
             }
         }
         
-        // Si pas de réponse originale trouvée, utiliser une réponse par défaut
         if (empty($originalResponse)) {
             $originalResponse = "Je suis un chatbot complètement bête et drôle qui travaille pour Vive-vice !";
         }
         
-        // Générer la variante
-        $variantIndex = ($responseIndex - 2) % count($variants); // -2 car la première réponse est l'originale
+        $variantIndex = ($responseIndex - 2) % count($variants);
         $newResponse = $variants[$variantIndex] . $originalResponse;
         
-        // Sauvegarder la nouvelle réponse
         if ($isLoggedIn && $db) {
             $messageObj = new Message($db);
             $messageObj->create($chatId, 'assistant', $newResponse);
@@ -227,7 +204,6 @@ switch ($action) {
             exit;
         }
 
-        // Sauvegarder le message dans la base de données
         if ($isLoggedIn && $db) {
             $messageObj = new Message($db);
             $messageObj->create($chatId, $role, $content);
@@ -237,7 +213,6 @@ switch ($action) {
         break;
 
     case 'generate_rating_comment':
-        // Générer un commentaire positif pour la notation
         $positiveComments = [
             'Le support est incroyable ! Service au top, je recommande vivement !',
             'Excellent service client, très réactif et professionnel !',
@@ -263,7 +238,6 @@ switch ($action) {
             $chats = $chatObj->getAllByUser($userId);
             echo json_encode(['success' => true, 'chats' => $chats]);
         } else {
-            // Mode invité : retourner un tableau vide (les chats sont en localStorage)
             echo json_encode(['success' => true, 'chats' => []]);
         }
         break;
@@ -287,7 +261,6 @@ switch ($action) {
             $messages = $messageObj->getAllByChat($chatId);
             echo json_encode(['success' => true, 'messages' => $messages, 'chat' => $chat]);
         } else {
-            // Mode invité : retourner un tableau vide (les messages sont en localStorage)
             echo json_encode(['success' => true, 'messages' => [], 'chat' => ['id' => $chatId, 'title' => 'Conversation locale']]);
         }
         break;
@@ -304,7 +277,6 @@ switch ($action) {
             $success = $chatObj->delete($chatId, $userId);
             echo json_encode(['success' => $success]);
         } else {
-            // Mode invité : toujours retourner success (suppression gérée côté client)
             echo json_encode(['success' => true]);
         }
         break;

@@ -4,7 +4,6 @@ class Database {
     private $conn;
 
     public function __construct() {
-        // Vérifier si SQLite est disponible
         if (!extension_loaded('pdo_sqlite')) {
             throw new Exception(
                 "L'extension PDO SQLite n'est pas activée sur ce serveur. " .
@@ -12,7 +11,6 @@ class Database {
             );
         }
 
-        // Créer le dossier data s'il n'existe pas
         $data_dir = __DIR__ . '/../data';
         if (!file_exists($data_dir)) {
             if (!mkdir($data_dir, 0755, true)) {
@@ -20,12 +18,10 @@ class Database {
             }
         }
         
-        // Vérifier les permissions d'écriture
         if (!is_writable($data_dir)) {
             throw new Exception("Le dossier data n'est pas accessible en écriture. Vérifiez les permissions.");
         }
         
-        // Initialiser la base de données si elle n'existe pas
         $db_path = __DIR__ . '/../' . $this->db_file;
         if (!file_exists($db_path)) {
             $this->initializeDatabase();
@@ -46,7 +42,6 @@ class Database {
                     ]
                 );
                 
-                // Activer les clés étrangères
                 $this->conn->exec("PRAGMA foreign_keys = ON");
             } catch(PDOException $e) {
                 error_log("Connection Error: " . $e->getMessage());
@@ -63,13 +58,11 @@ class Database {
             $conn = new PDO("sqlite:" . $db_path);
             $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             
-            // Activer les clés étrangères
             $conn->exec("PRAGMA foreign_keys = ON");
         } catch(PDOException $e) {
             throw new Exception("Erreur lors de la création de la base de données SQLite: " . $e->getMessage());
         }
         
-        // Créer les tables
         $sql = "
         -- Table des utilisateurs
         CREATE TABLE IF NOT EXISTS users (

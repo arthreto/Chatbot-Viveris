@@ -2,7 +2,6 @@
 require_once 'config/config.php';
 require_once 'config/database.php';
 
-// Permettre l'accès même sans connexion (sauvegarde en localStorage côté client)
 $isLoggedIn = isset($_SESSION['user_id']);
 $user = null;
 $db = null;
@@ -18,12 +17,10 @@ if ($isLoggedIn) {
             $user = $userObj->getById($_SESSION['user_id']);
         }
     } catch (Exception $e) {
-        // Erreur silencieuse, l'utilisateur pourra utiliser localStorage
         $isLoggedIn = false;
     }
 }
 
-// URL de connexion Google
 $googleAuthUrl = 'https://accounts.google.com/o/oauth2/v2/auth?' . http_build_query([
     'client_id' => GOOGLE_CLIENT_ID,
     'redirect_uri' => GOOGLE_REDIRECT_URI,
@@ -38,7 +35,7 @@ $googleAuthUrl = 'https://accounts.google.com/o/oauth2/v2/auth?' . http_build_qu
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo SITE_NAME; ?> - Chatbot Philosophique</title>
-    <link rel="icon" type="image/png" href="assets/mascotte.png">
+    <link rel="icon" type="image/png" href="assets/logo.png">
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

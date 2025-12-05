@@ -75,7 +75,6 @@ header('Content-Type: text/html; charset=utf-8');
         <?php
         $allOk = true;
         
-        // Vérifier PHP
         $phpVersion = phpversion();
         $phpOk = version_compare($phpVersion, '7.4.0', '>=');
         $allOk = $allOk && $phpOk;
@@ -89,7 +88,6 @@ header('Content-Type: text/html; charset=utf-8');
         </div>
 
         <?php
-        // Vérifier PDO SQLite
         $sqliteOk = extension_loaded('pdo_sqlite');
         $allOk = $allOk && $sqliteOk;
         ?>
@@ -110,7 +108,6 @@ header('Content-Type: text/html; charset=utf-8');
         </div>
 
         <?php
-        // Vérifier les permissions du dossier data
         $dataDir = __DIR__ . '/data';
         $dataDirExists = file_exists($dataDir);
         $dataDirWritable = $dataDirExists && is_writable($dataDir);
@@ -140,7 +137,6 @@ header('Content-Type: text/html; charset=utf-8');
         </div>
 
         <?php
-        // Vérifier cURL (pour OpenAI)
         $curlOk = extension_loaded('curl');
         ?>
         <div class="check-item <?php echo $curlOk ? 'success' : 'warning'; ?>">
@@ -153,7 +149,6 @@ header('Content-Type: text/html; charset=utf-8');
         </div>
 
         <?php
-        // Test de connexion SQLite
         if ($sqliteOk && $dataOk) {
             try {
                 $testDb = __DIR__ . '/data/test.db';
