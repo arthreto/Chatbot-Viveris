@@ -390,7 +390,8 @@ async function handleSendMessage(e) {
                 
                 // Toujours démarrer le système de réponses multiples
                 // Passer les variantes si disponibles (pour l'écologie)
-                startMultipleResponses(currentChatId, data.response, data.response_variants || []);
+                // Réponses multiples désactivées
+                // startMultipleResponses(currentChatId, data.response, data.response_variants || []);
             }
             
             // Recharger la liste des conversations
@@ -1008,12 +1009,24 @@ document.addEventListener('DOMContentLoaded', function() {
         // Navigation entre les pages
         navLinks.forEach(link => {
             link.addEventListener('click', function(e) {
+                // Si le lien a un href externe (ne commence pas par #), laisser le comportement par défaut
+                const href = this.getAttribute('href');
+                if (href && !href.startsWith('#')) {
+                    return; // Laisser le lien fonctionner normalement
+                }
+                
                 e.preventDefault();
                 
                 const targetPage = this.dataset.page;
+                if (!targetPage) return; // Si pas de data-page, ne rien faire
                 
                 // Mettre à jour les liens actifs
-                navLinks.forEach(l => l.classList.remove('active'));
+                navLinks.forEach(l => {
+                    // Ne mettre active que les liens internes
+                    if (l.getAttribute('href') && l.getAttribute('href').startsWith('#')) {
+                        l.classList.remove('active');
+                    }
+                });
                 this.classList.add('active');
                 
                 // Afficher la page correspondante

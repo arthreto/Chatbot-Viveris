@@ -85,6 +85,9 @@ $googleAuthUrl = 'https://accounts.google.com/o/oauth2/v2/auth?' . http_build_qu
         <div class="topbar-container">
             <div class="logo">Vive-vice</div>
             <div class="nav-links">
+                <a href="https://boulixien.velocitystudios.fr" class="nav-link" title="Retour à l'accueil principal" style="text-decoration: none;">
+                    <span>🏠</span> Home
+                </a>
                 <a href="#" class="nav-link active" data-page="accueil">Accueil</a>
                 <a href="#" class="nav-link" data-page="galerie">Galerie</a>
                 <a href="#" class="nav-link" data-page="information">Information</a>

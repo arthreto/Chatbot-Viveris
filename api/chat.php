@@ -143,16 +143,10 @@ switch ($action) {
             }
         }
 
-        // Générer 7 variantes de la réponse pour les messages suivants (sans appeler l'API)
-        // On crée des variantes basées sur la première réponse pour l'écologie
-        $responseVariants = generateResponseVariants($firstResponse);
-        
         $result = [
             'success' => true,
             'chat_id' => $chatId,
-            'response' => $firstResponse,
-            'multiple_responses' => true,
-            'response_variants' => $responseVariants // Les 7 autres réponses générées localement
+            'response' => $firstResponse
         ];
         error_log("Chat API: Envoi de la première réponse réussie pour chat_id: " . $chatId);
         echo json_encode($result);
